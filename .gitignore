@@ -1,0 +1,15 @@
+# Compiled output — never commit these
+target/
+*.class
+
+# Maven local cache
+.m2/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
