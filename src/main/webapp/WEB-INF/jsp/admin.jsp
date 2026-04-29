@@ -1,16 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.trustchat.model.User" %>
-<%@ page import="com.trustchat.model.PolicyRule" %>
-<%@ page import="com.trustchat.model.Message" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.TimeZone" %>
+<%@ page import="com.trustchat.model.*, java.util.List, java.text.SimpleDateFormat, java.util.TimeZone" %>
 <%
-    User currentUser              = (User)         session.getAttribute("user");
-    List<PolicyRule> rules        = (List<PolicyRule>) request.getAttribute("rules");
-    List<User>       users        = (List<User>)   request.getAttribute("users");
-    List<Message>    blockedMsgs  = (List<Message>) request.getAttribute("blockedMessages");
-    SimpleDateFormat sdf          = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+    User currentUser = (User) session.getAttribute("user");
+    List<PolicyRule> rules = (List<PolicyRule>) request.getAttribute("rules");
+    List<User> users = (List<User>) request.getAttribute("users");
+    List<Message> blockedMsgs = (List<Message>) request.getAttribute("blockedMessages");
+    
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");
     sdf.setTimeZone(TimeZone.getDefault());
 %>
 <!DOCTYPE html>
@@ -58,29 +54,34 @@
 <body>
     <div class="dashboard-layout">
         <div class="sidebar">
-            <div class="sidebar-header"><h2>⚙️ Admin</h2></div>
+            <div class="sidebar-header">
+                <h2>⚙️ Admin</h2>
+            </div>
+            
             <div class="user-info">
                 <p><strong>Admin:</strong></p>
                 <p><%= currentUser.getUsername() %></p>
             </div>
+            
             <ul class="sidebar-menu">
                 <li><a href="${pageContext.request.contextPath}/dashboard">📬 Dashboard</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin" class="active">📋 Policy Rules</a></li>
                 <li><a href="${pageContext.request.contextPath}/logout">🚪 Logout</a></li>
             </ul>
         </div>
-
+        
         <div class="main-content">
             <div class="admin-header">
                 <h1>🛡️ Policy Engine Management</h1>
                 <p style="color: #666; margin-top: 10px;">
-                    The 3 predefined message filtering rules for the chat system
+                    The predefined message filtering rules for the chat system
                 </p>
             </div>
 
             <% if (request.getAttribute("success") != null) { %>
                 <div class="alert alert-success"><%= request.getAttribute("success") %></div>
             <% } %>
+            
             <% if (request.getAttribute("error") != null) { %>
                 <div class="alert alert-error"><%= request.getAttribute("error") %></div>
             <% } %>
@@ -148,7 +149,9 @@
                             <% int rowNum = 1;
                                for (Message msg : blockedMsgs) {
                                    String safeText = msg.getMessageText()
-                                       .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                                       .replace("&", "&amp;")
+                                       .replace("<", "&lt;")
+                                       .replace(">", "&gt;");
                             %>
                                 <tr>
                                     <td><%= rowNum++ %></td>

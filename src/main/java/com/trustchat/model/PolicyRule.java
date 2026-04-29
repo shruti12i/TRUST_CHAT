@@ -11,7 +11,8 @@ public class PolicyRule {
     private int createdBy;
     private Timestamp createdAt;
 
-    public PolicyRule() {}
+    public PolicyRule() {
+    }
 
     public PolicyRule(String ruleName, String ruleType, String ruleValue) {
         this.ruleName = ruleName;
@@ -57,7 +58,7 @@ public class PolicyRule {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.isActive = active;
     }
 
     public int getCreatedBy() {

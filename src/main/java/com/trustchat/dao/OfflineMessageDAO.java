@@ -1,61 +1,32 @@
 package com.trustchat.dao;
 
-import com.trustchat.model.Message;
 import com.trustchat.util.DBUtil;
-
-import java.sql.*;
 
 public class OfflineMessageDAO {
 
     public boolean queueOfflineMessage(int senderId, int receiverId, String messageText) {
-        String sql = "INSERT INTO offline_messages (sender_id, receiver_id, message_text) " +
-                     "VALUES (?, ?, ?)";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, senderId);
-            pstmt.setInt(2, receiverId);
-            pstmt.setString(3, messageText);
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        String sql = "INSERT INTO offline_messages (sender_id, receiver_id, message_text) VALUES (?, ?, ?)";
+        return DBUtil.executeUpdate(sql, senderId, receiverId, messageText);
     }
 
     public int deliverOfflineMessages(int receiverId) {
-        String sql = "UPDATE offline_messages " +
-                     "SET delivered_at = NOW() " +
-                     "WHERE receiver_id = ? AND delivered_at IS NULL";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, receiverId);
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
+        // executeUpdate returns true/false based on if rows were changed,
+        // but the original code returned the number of rows.
+        // For simplicity, we can do a query to find the count first, then update them.
+        
+        String countSql = "SELECT COUNT(*) FROM offline_messages WHERE receiver_id = ? AND delivered_at IS NULL";
+        int pending = DBUtil.queryForInt(countSql, receiverId);
+        
+        if (pending > 0) {
+            String updateSql = "UPDATE offline_messages SET delivered_at = NOW() WHERE receiver_id = ? AND delivered_at IS NULL";
+            DBUtil.executeUpdate(updateSql, receiverId);
         }
+        
+        return pending;
     }
 
     public int getPendingCount(int receiverId) {
-        String sql = "SELECT COUNT(*) FROM offline_messages " +
-                     "WHERE receiver_id = ? AND delivered_at IS NULL";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, receiverId);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        String sql = "SELECT COUNT(*) FROM offline_messages WHERE receiver_id = ? AND delivered_at IS NULL";
+        return DBUtil.queryForInt(sql, receiverId);
     }
 }

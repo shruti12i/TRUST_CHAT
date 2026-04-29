@@ -28,11 +28,9 @@ public class PolicyEngine {
                 case "keyword":
                     blockReason = checkKeywordFilter(message.getMessageText(), rule.getRuleValue());
                     break;
-
                 case "time":
                     blockReason = checkTimeRestriction(rule.getRuleValue());
                     break;
-
                 case "user_role":
                     blockReason = checkRoleRestriction(sender, receiver, rule.getRuleValue());
                     break;
@@ -47,9 +45,7 @@ public class PolicyEngine {
     }
 
     private String checkKeywordFilter(String messageText, String blockedWords) {
-        if (messageText == null || blockedWords == null) {
-            return null;
-        }
+        if (messageText == null || blockedWords == null) return null;
 
         String[] keywords = blockedWords.split(",");
         String lowerMessage = messageText.toLowerCase();
@@ -65,9 +61,7 @@ public class PolicyEngine {
     }
 
     private String checkTimeRestriction(String timeRange) {
-        if (timeRange == null || !timeRange.contains("-")) {
-            return null;
-        }
+        if (timeRange == null || !timeRange.contains("-")) return null;
 
         try {
             String[] times = timeRange.split("-");
@@ -75,12 +69,9 @@ public class PolicyEngine {
             LocalTime endTime = LocalTime.parse(times[1].trim(), TIME_FORMAT);
             LocalTime currentTime = LocalTime.now();
 
-            boolean isWithinWindow;
-            if (startTime.isBefore(endTime)) {
-                isWithinWindow = !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
-            } else {
-                isWithinWindow = !currentTime.isBefore(startTime) || !currentTime.isAfter(endTime);
-            }
+            boolean isWithinWindow = startTime.isBefore(endTime) ? 
+                (!currentTime.isBefore(startTime) && !currentTime.isAfter(endTime)) : 
+                (!currentTime.isBefore(startTime) || !currentTime.isAfter(endTime));
 
             if (!isWithinWindow) {
                 return "Messages are only allowed between " + startTime + " and " + endTime;
@@ -93,29 +84,20 @@ public class PolicyEngine {
     }
 
     private String checkRoleRestriction(User sender, User receiver, String ruleValue) {
-        if (ruleValue == null) {
-            return null;
-        }
+        if (ruleValue == null) return null;
 
         try {
             String[] parts = ruleValue.split(":");
-            if (parts.length != 2) {
-                return null;
-            }
+            if (parts.length != 2) return null;
 
             String roleMatch = parts[0].trim();
             String action = parts[1].trim().toLowerCase();
 
             String[] roles = roleMatch.split("->");
-            if (roles.length != 2) {
-                return null;
-            }
+            if (roles.length != 2) return null;
 
-            String senderRole = roles[0].trim().toLowerCase();
-            String receiverRole = roles[1].trim().toLowerCase();
-
-            boolean senderMatches = sender.getRole().equalsIgnoreCase(senderRole);
-            boolean receiverMatches = receiver.getRole().equalsIgnoreCase(receiverRole);
+            boolean senderMatches = sender.getRole().equalsIgnoreCase(roles[0].trim());
+            boolean receiverMatches = receiver.getRole().equalsIgnoreCase(roles[1].trim());
 
             if (senderMatches && receiverMatches && "deny".equals(action)) {
                 return sender.getRole() + " cannot send messages to " + receiver.getRole();
@@ -138,16 +120,8 @@ public class PolicyEngine {
             this.triggeredRule = triggeredRule;
         }
 
-        public boolean isBlocked() {
-            return isBlocked;
-        }
-
-        public String getBlockReason() {
-            return blockReason;
-        }
-
-        public String getTriggeredRule() {
-            return triggeredRule;
-        }
+        public boolean isBlocked() { return isBlocked; }
+        public String getBlockReason() { return blockReason; }
+        public String getTriggeredRule() { return triggeredRule; }
     }
 }

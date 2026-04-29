@@ -19,12 +19,12 @@ import java.util.Map;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-    private UserDAO    userDAO;
+    private UserDAO userDAO;
     private MessageDAO messageDAO;
 
     @Override
     public void init() throws ServletException {
-        userDAO    = new UserDAO();
+        userDAO = new UserDAO();
         messageDAO = new MessageDAO();
     }
 
@@ -39,14 +39,9 @@ public class DashboardServlet extends HttpServlet {
         }
 
         User currentUser = (User) session.getAttribute("user");
-
         List<User> users = userDAO.getAllUsersExcept(currentUser.getUserId());
-        int unreadCount = messageDAO.getUnreadCount(currentUser.getUserId());
-
-        Map<Integer, Integer> unreadPerSender =
-                messageDAO.getUnreadCountPerSender(currentUser.getUserId());
-
         Map<Integer, Message> lastMessages = new HashMap<>();
+
         for (User user : users) {
             Message last = messageDAO.getLastMessage(currentUser.getUserId(), user.getUserId());
             if (last != null) {
@@ -55,8 +50,8 @@ public class DashboardServlet extends HttpServlet {
         }
 
         request.setAttribute("users", users);
-        request.setAttribute("unreadCount", unreadCount);
-        request.setAttribute("unreadPerSender", unreadPerSender);
+        request.setAttribute("unreadCount", messageDAO.getUnreadCount(currentUser.getUserId()));
+        request.setAttribute("unreadPerSender", messageDAO.getUnreadCountPerSender(currentUser.getUserId()));
         request.setAttribute("lastMessages", lastMessages);
 
         request.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp").forward(request, response);

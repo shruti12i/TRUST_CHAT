@@ -1,7 +1,9 @@
 package com.trustchat.servlet;
+
 import com.trustchat.dao.OfflineMessageDAO;
 import com.trustchat.dao.UserDAO;
 import com.trustchat.model.User;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +20,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        userDAO    = new UserDAO();
+        userDAO = new UserDAO();
         offlineDAO = new OfflineMessageDAO();
     }
 
@@ -42,8 +44,7 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        if (username == null || username.trim().isEmpty() ||
-            password == null || password.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Username and password are required");
             request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
             return;

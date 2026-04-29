@@ -3,8 +3,6 @@ package com.trustchat.servlet;
 import com.trustchat.dao.MessageDAO;
 import com.trustchat.dao.PolicyDAO;
 import com.trustchat.dao.UserDAO;
-import com.trustchat.model.Message;
-import com.trustchat.model.PolicyRule;
 import com.trustchat.model.User;
 
 import javax.servlet.ServletException;
@@ -14,57 +12,53 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
 
-    private PolicyDAO  policyDAO;
-    private UserDAO    userDAO;
+    private PolicyDAO policyDAO;
+    private UserDAO userDAO;
     private MessageDAO messageDAO;
 
     @Override
     public void init() throws ServletException {
-        policyDAO  = new PolicyDAO();
-        userDAO    = new UserDAO();
+        policyDAO = new PolicyDAO();
+        userDAO = new UserDAO();
         messageDAO = new MessageDAO();
+    }
+
+    private boolean isUserAdmin(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) return false;
+        User user = (User) session.getAttribute("user");
+        return user.isAdmin();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User currentUser = (User) session.getAttribute("user");
-
-        if (!currentUser.isAdmin()) {
+        if (!isUserAdmin(request)) {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
 
-        List<PolicyRule> rules = policyDAO.getAllRules();
-        List<User> users = userDAO.getAllUsers();
-        List<Message> blockedMessages = messageDAO.getAllBlockedMessages();
+        HttpSession session = request.getSession(false);
+        String adminSuccess = (String) session.getAttribute("adminSuccess");
+        String adminError = (String) session.getAttribute("adminError");
 
-        String adminSuccess = (String) request.getSession().getAttribute("adminSuccess");
-        String adminError   = (String) request.getSession().getAttribute("adminError");
         if (adminSuccess != null) {
             request.setAttribute("success", adminSuccess);
-            request.getSession().removeAttribute("adminSuccess");
+            session.removeAttribute("adminSuccess");
         }
         if (adminError != null) {
             request.setAttribute("error", adminError);
-            request.getSession().removeAttribute("adminError");
+            session.removeAttribute("adminError");
         }
 
-        request.setAttribute("rules", rules);
-        request.setAttribute("users", users);
-        request.setAttribute("blockedMessages", blockedMessages);
+        request.setAttribute("rules", policyDAO.getAllRules());
+        request.setAttribute("users", userDAO.getAllUsers());
+        request.setAttribute("blockedMessages", messageDAO.getAllBlockedMessages());
 
         request.getRequestDispatcher("/WEB-INF/jsp/admin.jsp").forward(request, response);
     }
@@ -73,15 +67,7 @@ public class AdminServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User currentUser = (User) session.getAttribute("user");
-
-        if (!currentUser.isAdmin()) {
+        if (!isUserAdmin(request)) {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }

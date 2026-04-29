@@ -30,56 +30,40 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username        = request.getParameter("username");
-        String password        = request.getParameter("password");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-        String email           = request.getParameter("email");
-        String role            = request.getParameter("role");
+        String email = request.getParameter("email");
+        String role = request.getParameter("role");
 
-        if (username == null || username.trim().isEmpty() ||
-            password == null || password.trim().isEmpty() ||
-            email    == null || email.trim().isEmpty()    ||
-            role     == null || role.trim().isEmpty()) {
-
-            request.setAttribute("error", "All fields are required");
-            preserveFormValues(request, username, email, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+        if (isAnyEmpty(username, password, email, role)) {
+            handleError(request, response, "All fields are required", username, email, role);
             return;
         }
 
         String roleLower = role.trim().toLowerCase();
         if (!roleLower.equals("student") && !roleLower.equals("teacher")) {
-            request.setAttribute("error", "Invalid role. Only Student or Teacher can register.");
-            preserveFormValues(request, username, email, "");
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Invalid role. Only Student or Teacher can register.", username, email, "");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            request.setAttribute("error", "Passwords do not match");
-            preserveFormValues(request, username, email, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Passwords do not match", username, email, role);
             return;
         }
 
         if (password.length() < 6) {
-            request.setAttribute("error", "Password must be at least 6 characters");
-            preserveFormValues(request, username, email, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Password must be at least 6 characters", username, email, role);
             return;
         }
 
         if (userDAO.usernameExists(username.trim())) {
-            request.setAttribute("error", "Username already exists");
-            preserveFormValues(request, null, email, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Username already exists", null, email, role);
             return;
         }
 
         if (userDAO.emailExists(email.trim())) {
-            request.setAttribute("error", "Email already registered");
-            preserveFormValues(request, username, null, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Email already registered", username, null, role);
             return;
         }
 
@@ -89,16 +73,25 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("success", "Registration successful! Please login.");
             request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
         } else {
-            request.setAttribute("error", "Registration failed. Please try again.");
-            preserveFormValues(request, username, email, role);
-            request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
+            handleError(request, response, "Registration failed. Please try again.", username, email, role);
         }
     }
 
-    private void preserveFormValues(HttpServletRequest request,
-                                    String username, String email, String role) {
+    private boolean isAnyEmpty(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage, 
+                             String username, String email, String role) throws ServletException, IOException {
+        request.setAttribute("error", errorMessage);
         if (username != null) request.setAttribute("username", username);
-        if (email    != null) request.setAttribute("email", email);
-        if (role     != null) request.setAttribute("role", role);
+        if (email != null) request.setAttribute("email", email);
+        if (role != null) request.setAttribute("role", role);
+        request.getRequestDispatcher("/WEB-INF/jsp/register.jsp").forward(request, response);
     }
 }

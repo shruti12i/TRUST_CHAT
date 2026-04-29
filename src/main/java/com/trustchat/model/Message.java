@@ -15,7 +15,8 @@ public class Message {
     private String senderUsername;
     private String receiverUsername;
 
-    public Message() {}
+    public Message() {
+    }
 
     public Message(int senderId, int receiverId, String messageText) {
         this.senderId = senderId;
@@ -70,7 +71,7 @@ public class Message {
     }
 
     public void setRead(boolean read) {
-        isRead = read;
+        this.isRead = read;
     }
 
     public boolean isBlocked() {
@@ -78,7 +79,7 @@ public class Message {
     }
 
     public void setBlocked(boolean blocked) {
-        isBlocked = blocked;
+        this.isBlocked = blocked;
     }
 
     public String getBlockReason() {

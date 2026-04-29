@@ -12,7 +12,8 @@ public class User {
     private Timestamp lastLogin;
     private boolean isActive;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String password, String email, String role) {
         this.username = username;
@@ -83,7 +84,7 @@ public class User {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.isActive = active;
     }
 
     public boolean isAdmin() {

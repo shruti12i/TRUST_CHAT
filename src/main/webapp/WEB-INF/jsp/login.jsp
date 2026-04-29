@@ -27,23 +27,20 @@
 
             <form method="post" action="${pageContext.request.contextPath}/login">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username"
-                           value="${username}" required autofocus>
+                    <label>Username</label>
+                    <input type="text" name="username" value="${username}" required autofocus>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <label>Password</label>
+                    <input type="password" name="password" required>
                 </div>
 
                 <button type="submit" class="btn">Login</button>
             </form>
 
             <div class="auth-links">
-                <p>Don't have an account?
-                    <a href="${pageContext.request.contextPath}/register">Register here</a>
-                </p>
+                <p>Don't have an account? <a href="${pageContext.request.contextPath}/register">Register here</a></p>
             </div>
         </div>
     </div>
