@@ -6,7 +6,7 @@
          version="3.0">
 
     <display-name>TRUST_CHAT</display-name>
-    <description>Trust-based Chat System with Policy Engine - Phase 1</description>
+    <description>Trust-based Chat System with Policy Engine </description>
 
     <welcome-file-list>
         <welcome-file>login</welcome-file>

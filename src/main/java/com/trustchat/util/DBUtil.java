@@ -8,7 +8,7 @@ public class DBUtil {
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/trust_chat?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password";
+    private static final String DB_PASSWORD = "shrutiR2005@1";
 
     static {
         try {

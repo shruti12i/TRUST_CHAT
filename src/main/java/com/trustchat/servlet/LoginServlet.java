@@ -1,9 +1,7 @@
 package com.trustchat.servlet;
-
 import com.trustchat.dao.OfflineMessageDAO;
 import com.trustchat.dao.UserDAO;
 import com.trustchat.model.User;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
